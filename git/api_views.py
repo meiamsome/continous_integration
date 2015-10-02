@@ -21,4 +21,5 @@ def hook_url(request, repository):
     if branch.head != commit:
         Push.objects.create(repository=repository, before=branch.head, after=commit, branch=branch)
         branch.head = commit
+        branch.save()
     return HttpResponse(json.dumps({'status':200}))
