@@ -11,6 +11,9 @@ class Repository(models.Model):
     name = models.CharField(max_length=200)
     mainline = models.ForeignKey("Branch", null=True, blank=True, related_name='__not_used')
 
+    def get_name(self):
+        return self.owner.username + "/" + self.name
+
 
 class Commit(models.Model):
     """Represents a single commit. previous_commit_left is the last commit in this branch, previous_commit_right is the

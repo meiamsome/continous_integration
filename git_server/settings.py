@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'git',
     'task_manager',
+    'git_scheduler',
 )
 
 MIDDLEWARE_CLASSES = (
