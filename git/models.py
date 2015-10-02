@@ -8,6 +8,7 @@ REPO_FILE_PATH = getattr(settings, 'REPO_FILE_PATH', './repos/')
 class Repository(models.Model):
     """Represents a git repository"""
     owner = models.ForeignKey(AUTH_USER_MODEL)
+    name = models.CharField(max_length=200)
     mainline = models.ForeignKey("Branch", null=True, blank=True, related_name='__not_used')
 
 
@@ -34,4 +35,13 @@ class Commit(models.Model):
 class Branch(models.Model):
     """Represents a branch of a git tree, with it's own head"""
     repository = models.ForeignKey(Repository)
+    ref = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     head = models.ForeignKey(Commit)
+
+
+class Push(models.Model):
+    repository = models.ForeignKey(Repository)
+    before = models.ForeignKey(Commit, related_name="pre_pushes")
+    after = models.ForeignKey(Commit, related_name="post_pushes")
+    branch = models.ForeignKey(Branch)
