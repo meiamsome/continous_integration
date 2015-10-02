@@ -15,5 +15,5 @@ def resolve_repository(old_function):
 def verify_github_hmac(old_function):
     def handler(request, repository, *args, **kwargs):
         # TODO
-        old_function(request, repository, *args, **kwargs)
+        return old_function(request, repository, *args, **kwargs)
     return handler
