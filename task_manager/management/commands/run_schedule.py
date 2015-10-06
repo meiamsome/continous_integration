@@ -1,8 +1,22 @@
+from contextlib import contextmanager
 from django.core.management.base import BaseCommand, CommandError
 import os
 import pwd
+import tempfile
 
 from task_manager.models import ScheduledTask
+
+@contextmanager
+def chdir_temporary_folder(folder_in):
+    folder = tempfile.mkdtemp() if folder_in is None else folder_in
+    old_folder = os.getcwd()
+    os.chdir(folder)
+    try:
+        yield
+    finally:
+        os.chdir(old_folder)
+        if folder_in is None:
+            os.rmtree(folder)
 
 
 class Command(BaseCommand):
@@ -23,16 +37,19 @@ class Command(BaseCommand):
 
     @staticmethod
     def run_task(scheduled_task):
-        os.chdir(scheduled_task.working_directory)
-        pipe = os.popen(scheduled_task.task.execution + " " + scheduled_task.arguments)
-        scheduled_task.output = "\n".join(pipe.readlines())
-        pid, exit_status = os.wait()
-        if exit_status & 0xF:
-            # Error
-            pass
-        exit_status >>= 8
-        if exit_status == 0:
-            scheduled_task.status = ScheduledTask.COMPLETED
-        else:
-            scheduled_task.status = ScheduledTask.ERROR
-        scheduled_task.save()
+        directory = scheduled_task.working_directory if scheduled_task.working_directory else None
+        with chdir_temporary_folder(directory):
+            pipe = os.popen(scheduled_task.task.execution + " " + scheduled_task.arguments)
+            scheduled_task.output += "\n".join(pipe.readlines())
+            pid, exit_status = os.wait()
+            if exit_status & 0xF:
+                # Error - process got killed
+                return
+            exit_status >>= 8
+            if exit_status == 0:
+                scheduled_task.status = ScheduledTask.COMPLETED
+            elif exit_status & 0x8:
+                return  # If we have this status code then we should re-queue the task.
+            else:
+                scheduled_task.status = ScheduledTask.ERROR
+            scheduled_task.save()
