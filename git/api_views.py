@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -16,7 +16,11 @@ def hook_url(request, repository):
     data = json.loads(request.body)
     post_commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['after'])
     pre_commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['before'])
-    time = datetime(data['head_commit']['timestamp'])
+    t_string = data['head_commit']['timestamp']
+    timezone = timedelta(hours=int(t_string[-5:-3]), minutes=int(t_string[-2:]))
+    if t_string[-6] == '-':
+        timezone = - timezone
+    time = datetime.strptime(t_string[:-6], "%Y-%m-%dT%H:%M:%S") - timezone
     branch, _ = Branch.objects.get_or_create(repository=repository, ref=data['ref'], defaults={
         'name': data['ref'].split('/')[-1],
         'head': post_commit,
