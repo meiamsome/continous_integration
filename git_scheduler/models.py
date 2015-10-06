@@ -19,9 +19,9 @@ def build_tasks(sender, instance, created, *args, **kwargs):
         repository = instance.repository
         tasks = RegisteredTask.objects.filter(assign_on_push=True, repository=repository)
         for task in tasks:
-            if task.branch is None or task.branch == sender.branch:
+            if task.branch is None or task.branch == instance.branch:
                 ScheduledTask(task=task.task, user=task.user, arguments=" ".join((
                     repository.get_name(),
-                    sender.branch.ref,
+                    instance.branch.name,
                     instance.after.hash,
                 ))).save()
