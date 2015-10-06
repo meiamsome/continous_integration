@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -13,13 +14,15 @@ from models import Branch, Commit, Push
 @verify_github_hmac
 def hook_url(request, repository):
     data = json.loads(request.body)
-    commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['after'])
+    post_commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['after'])
+    pre_commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['before'])
+    time = datetime(data['head_commit']['timestamp'])
     branch, _ = Branch.objects.get_or_create(repository=repository, ref=data['ref'], defaults={
         'name': data['ref'].split('/')[-1],
-        'head': commit,
+        'head': post_commit,
     })
-    if branch.head != commit:
-        Push.objects.create(repository=repository, before=branch.head, after=commit, branch=branch)
-        branch.head = commit
+    if branch.head != post_commit:
+        Push.objects.create(repository=repository, before=pre_commit, after=post_commit, branch=branch, time=time)
+        branch.head = post_commit
         branch.save()
     return HttpResponse(json.dumps({'status':200}))

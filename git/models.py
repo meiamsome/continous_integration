@@ -47,4 +47,5 @@ class Push(models.Model):
     repository = models.ForeignKey(Repository)
     before = models.ForeignKey(Commit, related_name="pre_pushes")
     after = models.ForeignKey(Commit, related_name="post_pushes")
+    time = models.DateTimeField()
     branch = models.ForeignKey(Branch)
