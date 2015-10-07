@@ -62,3 +62,6 @@ target/
 
 # Django Development database
 db.sqlite3
+
+# Django static files
+static/
