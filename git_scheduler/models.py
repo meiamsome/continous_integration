@@ -28,7 +28,7 @@ def build_tasks(sender, instance, created, *args, **kwargs):
         tasks = RegisteredTask.objects.filter(assign_on_push=True, repository=repository)
         for task in tasks:
             if task.branch is None or task.branch == instance.branch:
-                ScheduledTask(task=task.task, user=task.user, working_directoyr=task.working_directory,
+                ScheduledTask(task=task.task, user=task.user, working_directory=task.working_directory,
                               arguments=" ".join((
                     repository.get_name(),
                     instance.branch.name,
