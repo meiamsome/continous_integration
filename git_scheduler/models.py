@@ -12,6 +12,13 @@ class RegisteredTask(models.Model):
     user = models.CharField(max_length=32)
     assign_on_push = models.BooleanField(default=False)
 
+    def __unicode__(self):
+        name = u"Task on " + self.repository
+        if self.branch is not None:
+            name += u"/" + self.branch
+        name += u": Executing '" + self.task + u"' as user '" + self.user + u"'"
+        return name
+
 
 @receiver(models.signals.post_save)
 def build_tasks(sender, instance, created, *args, **kwargs):
