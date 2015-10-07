@@ -14,6 +14,9 @@ class Repository(models.Model):
     def get_name(self):
         return self.owner.username + "/" + self.name
 
+    def __unicode__(self):
+        return self.get_name()
+
 
 class Commit(models.Model):
     """Represents a single commit. previous_commit_left is the last commit in this branch, previous_commit_right is the
@@ -34,6 +37,9 @@ class Commit(models.Model):
     def is_merge(self):
         return self.previous_commit_right is not None
 
+    def __unicode__(self):
+        return self.hash
+
 
 class Branch(models.Model):
     """Represents a branch of a git tree, with it's own head"""
@@ -42,6 +48,9 @@ class Branch(models.Model):
     name = models.CharField(max_length=200)
     head = models.ForeignKey(Commit)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Push(models.Model):
     repository = models.ForeignKey(Repository)
@@ -49,3 +58,6 @@ class Push(models.Model):
     after = models.ForeignKey(Commit, related_name="post_pushes")
     time = models.DateTimeField()
     branch = models.ForeignKey(Branch)
+
+    def __unicode__(self):
+        return u"Push on " + self.repository + u"/" + self.branch + u" from " + self.before + u" to " + self.after
