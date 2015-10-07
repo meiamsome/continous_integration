@@ -2,8 +2,12 @@ from django.db import models
 
 
 class Task(models.Model):
+    name = models.CharField(max_length=100)
     execution = models.TextField()
     is_safe = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
 
 
 class ScheduledTask(models.Model):
@@ -21,3 +25,6 @@ class ScheduledTask(models.Model):
     ), default=0)
     working_directory = models.TextField()
     output = models.TextField()
+
+    def __unicode__(self):
+        return u"'" + self.task + u"' scheduled. (" + self.get_status_display() + u")"
