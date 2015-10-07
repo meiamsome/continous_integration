@@ -60,4 +60,4 @@ class Push(models.Model):
     branch = models.ForeignKey(Branch)
 
     def __unicode__(self):
-        return u"Push on " + self.repository + u"/" + self.branch + u" from " + self.before + u" to " + self.after
+        return u"Push on %s/%s from %s to %s" % (self.repository, self.branch, self.before, self.after)

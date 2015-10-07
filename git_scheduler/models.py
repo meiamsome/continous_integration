@@ -14,10 +14,10 @@ class RegisteredTask(models.Model):
     working_directory = models.TextField()
 
     def __unicode__(self):
-        name = u"Task on " + self.repository
+        name = u"Task on %s" % (self.repository, )
         if self.branch is not None:
-            name += u"/" + self.branch
-        name += u": Executing '" + self.task + u"' as user '" + self.user + u"'"
+            name += u"/%s" % (self.branch, )
+        name += u": Executing '%s' as user '%s'" % (self.task, self.user)
         return name
 
 

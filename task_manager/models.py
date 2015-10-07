@@ -27,4 +27,4 @@ class ScheduledTask(models.Model):
     output = models.TextField()
 
     def __unicode__(self):
-        return u"'" + self.task + u"' scheduled. (" + self.get_status_display() + u")"
+        return u"'%s' scheduled. (%s)" % (self.task, self.get_status_display())
