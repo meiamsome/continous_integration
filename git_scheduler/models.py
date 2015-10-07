@@ -11,6 +11,7 @@ class RegisteredTask(models.Model):
     task = models.ForeignKey(Task)
     user = models.CharField(max_length=32)
     assign_on_push = models.BooleanField(default=False)
+    working_directory = models.TextField()
 
     def __unicode__(self):
         name = u"Task on " + self.repository
@@ -27,7 +28,8 @@ def build_tasks(sender, instance, created, *args, **kwargs):
         tasks = RegisteredTask.objects.filter(assign_on_push=True, repository=repository)
         for task in tasks:
             if task.branch is None or task.branch == instance.branch:
-                ScheduledTask(task=task.task, user=task.user, arguments=" ".join((
+                ScheduledTask(task=task.task, user=task.user, working_directoyr=task.working_directory,
+                              arguments=" ".join((
                     repository.get_name(),
                     instance.branch.name,
                     instance.after.hash,
