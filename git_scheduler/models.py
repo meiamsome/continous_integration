@@ -22,7 +22,7 @@ class RegisteredTask(models.Model):
 
 
 class TaskToPush(models.Model):
-    task = models.ForeignKey(Task)
+    task = models.ForeignKey(ScheduledTask)
     push = models.ForeignKey(Push)
 
 
