@@ -27,9 +27,18 @@ class SlackAlert(models.Model):
         client = self.bot.get_client()
         channel = self.channel
         if channel[0] == '@':
-            resp = json.loads(client.api_call('im.open', user=channel[1:]))
+            resp = json.loads(client.api_call('users.list'))
             try:
-                channel = resp['channel']['id']
+                user_id = None
+                for user in resp['members']:
+                    if channel[1:].lower() == user['name'].lower():
+                        user_id = user['id']
+                        break
+                if user_id is not None:
+                    resp2 = json.loads(client.api_call('im.open', user=user_id))
+                    channel = resp2['channel']['id']
+                    self.channel = channel
+                    self.save()
             except KeyError:
                 pass
         client.api_call('chat.postMessage', channel=channel, username=self.bot.name,text=message)
