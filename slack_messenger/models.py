@@ -1,5 +1,6 @@
 from django.db import models
 from slackclient import SlackClient
+import json
 
 from git.models import Repository, Branch
 
@@ -24,4 +25,11 @@ class SlackAlert(models.Model):
 
     def alert(self, message):
         client = self.bot.get_client()
-        client.api_call('chat.postMessage', channel=self.channel, username=self.bot.name,text=message)
+        channel = self.channel
+        if channel[0] == '@':
+            resp = json.loads(client.api_call('im.open', user=channel[1:]))
+            try:
+                channel = resp['channel']['id']
+            except KeyError:
+                pass
+        client.api_call('chat.postMessage', channel=channel, username=self.bot.name,text=message)
