@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from git.models import Push
 from git_scheduler.models import RegisteredTask, TaskToPush
 from task_manager.models import ScheduledTask
-from slack_messenger.models import SlackAlerts
+from slack_messenger.models import SlackAlert
 
 
 @receiver(post_save)
@@ -14,7 +14,7 @@ def handle_task_save(sender, instance, created, *args, **kwargs):
         if created:
             repository = instance.push.repository
             branch = instance.push.branch
-            relevant_alerts = SlackAlerts.object.filter(repository=repository, Q(branch=branch) | Q(branch=None))
+            relevant_alerts = SlackAlert.object.filter(Q(branch=branch) | Q(branch=None), repository=repository)
             if not relevant_alerts:
                 return
             message = "Task '%s' assigned to commit %s on %s/%s" %\
@@ -27,7 +27,7 @@ def handle_task_save(sender, instance, created, *args, **kwargs):
             task_to_push = TaskToPush.objects.get(task=instance)
             repository = task_to_push.push.repository
             branch = task_to_push.push.branch
-            relevant_alerts = SlackAlerts.object.filter(repository=repository, Q(branch=branch) | Q(branch=None))
+            relevant_alerts = SlackAlert.object.filter(Q(branch=branch) | Q(branch=None), repository=repository)
             if not relevant_alerts:
                 return
             message = "Task '%s' updated for commit %s on %s/%s.\nStatus: %s" %\

@@ -16,7 +16,7 @@ class SlackBot(models.Model):
         return self.__slack_client
 
 
-class SlackAlerts(models.Model):
+class SlackAlert(models.Model):
     bot = models.ForeignKey(SlackBot)
     repository = models.ForeignKey(Repository)
     branch = models.ForeignKey(Branch, blank=True)
