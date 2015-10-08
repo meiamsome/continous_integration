@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'git',
     'task_manager',
     'git_scheduler',
+    'slack_messenger',
 )
 
 MIDDLEWARE_CLASSES = (
