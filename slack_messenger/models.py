@@ -24,8 +24,4 @@ class SlackAlert(models.Model):
 
     def alert(self, message):
         client = self.bot.get_client()
-        client.api_call(['chat.postMessage', {
-            'channel': self.channel,
-            'username': self.bot.name,
-            'text': message,
-        }])
+        client.api_call('chat.postMessage', channel=self.channel, username=self.bot.name,text=message)
