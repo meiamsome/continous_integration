@@ -19,7 +19,7 @@ class SlackBot(models.Model):
 class SlackAlert(models.Model):
     bot = models.ForeignKey(SlackBot)
     repository = models.ForeignKey(Repository)
-    branch = models.ForeignKey(Branch, blank=True)
+    branch = models.ForeignKey(Branch, blank=True, null=True)
     channel = models.CharField(max_length=100)
 
     def alert(self, message):
