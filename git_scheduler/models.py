@@ -21,6 +21,11 @@ class RegisteredTask(models.Model):
         return name
 
 
+class TaskToPush(models.Model):
+    task = models.ForeignKey(Task)
+    push = models.ForeignKey(Push)
+
+
 @receiver(models.signals.post_save)
 def build_tasks(sender, instance, created, *args, **kwargs):
     if created and sender == Push:
@@ -28,9 +33,11 @@ def build_tasks(sender, instance, created, *args, **kwargs):
         tasks = RegisteredTask.objects.filter(assign_on_push=True, repository=repository)
         for task in tasks:
             if task.branch is None or task.branch == instance.branch:
-                ScheduledTask(task=task.task, user=task.user, working_directory=task.working_directory,
+                created = ScheduledTask(task=task.task, user=task.user, working_directory=task.working_directory,
                               arguments=" ".join((
                     repository.get_name(),
                     instance.branch.name,
                     instance.after.hash,
-                ))).save()
+                )))
+                created.save()
+                TaskToPush(task=created, push=instance).save()
