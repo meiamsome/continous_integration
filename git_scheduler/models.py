@@ -10,6 +10,7 @@ class RegisteredTask(models.Model):
     task = models.ForeignKey(Task)
     user = models.CharField(max_length=32)
     assign_on_push = models.BooleanField(default=False)
+    submit_status = models.BooleanField(default=False)
     working_directory = models.TextField()
 
     def __unicode__(self):
@@ -23,3 +24,9 @@ class RegisteredTask(models.Model):
 class TaskToPush(models.Model):
     task = models.ForeignKey(ScheduledTask)
     push = models.ForeignKey(Push)
+
+
+class GitHubAccessToken(models.Model):
+    token = models.CharField(max_length=40)
+    repositories = models.ManyToManyField(Repository)
+    submit_status = models.BooleanField(default=False)
