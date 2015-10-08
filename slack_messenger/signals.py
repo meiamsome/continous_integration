@@ -14,7 +14,7 @@ def handle_task_save(sender, instance, created, *args, **kwargs):
         if created:
             repository = instance.push.repository
             branch = instance.push.branch
-            relevant_alerts = SlackAlert.object.filter(Q(branch=branch) | Q(branch=None), repository=repository)
+            relevant_alerts = SlackAlert.objects.filter(Q(branch=branch) | Q(branch=None), repository=repository)
             if not relevant_alerts:
                 return
             message = "Task '%s' assigned to commit %s on %s/%s" %\
@@ -27,7 +27,7 @@ def handle_task_save(sender, instance, created, *args, **kwargs):
             task_to_push = TaskToPush.objects.get(task=instance)
             repository = task_to_push.push.repository
             branch = task_to_push.push.branch
-            relevant_alerts = SlackAlert.object.filter(Q(branch=branch) | Q(branch=None), repository=repository)
+            relevant_alerts = SlackAlert.objects.filter(Q(branch=branch) | Q(branch=None), repository=repository)
             if not relevant_alerts:
                 return
             message = "Task '%s' updated for commit %s on %s/%s.\nStatus: %s" %\
