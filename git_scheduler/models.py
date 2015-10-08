@@ -1,5 +1,4 @@
 from django.db import models
-from django.dispatch import receiver
 
 from git.models import Push, Repository, Branch
 from task_manager.models import Task, ScheduledTask
@@ -24,20 +23,3 @@ class RegisteredTask(models.Model):
 class TaskToPush(models.Model):
     task = models.ForeignKey(ScheduledTask)
     push = models.ForeignKey(Push)
-
-
-@receiver(models.signals.post_save)
-def build_tasks(sender, instance, created, *args, **kwargs):
-    if created and sender == Push:
-        repository = instance.repository
-        tasks = RegisteredTask.objects.filter(assign_on_push=True, repository=repository)
-        for task in tasks:
-            if task.branch is None or task.branch == instance.branch:
-                created = ScheduledTask(task=task.task, user=task.user, working_directory=task.working_directory,
-                              arguments=" ".join((
-                    repository.get_name(),
-                    instance.branch.name,
-                    instance.after.hash,
-                )))
-                created.save()
-                TaskToPush(task=created, push=instance).save()
