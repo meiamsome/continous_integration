@@ -14,7 +14,7 @@ class RegisteredTask(models.Model):
     user = models.CharField(max_length=32)
     assign_on_push = models.BooleanField(default=False)
     submit_status = models.BooleanField(default=False)
-    working_directory = models.TextField()
+    working_directory = models.TextField(blank=True)
 
     def __unicode__(self):
         name = u"Task on %s" % (self.repository, )
