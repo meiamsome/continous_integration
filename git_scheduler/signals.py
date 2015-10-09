@@ -15,7 +15,7 @@ def build_tasks(sender, instance, created, *args, **kwargs):
         for task in tasks:
             if task.branch is None or task.branch == instance.branch:
                 created = ScheduledTask(task=task.task, user=task.user, working_directory=task.working_directory,
-                                        arguments=" ".join((
+                                        submit_status=task.submit_status, arguments=" ".join((
                                             repository.get_name(),
                                             instance.branch.name,
                                             instance.after.hash,
@@ -26,7 +26,6 @@ def build_tasks(sender, instance, created, *args, **kwargs):
     if sender == TaskToPush:
         if created and instance.submit_status:
             update_github_status(instance)
-
 
     if sender == ScheduledTask:
         if not created:
@@ -39,6 +38,8 @@ def build_tasks(sender, instance, created, *args, **kwargs):
 
 
 def update_github_status(tasktopush):
+    if not tasktopush.submit_status:
+        return
     repository = tasktopush.push.repository
     token = GitHubAccessToken.objects.filter(repositories__contains=repository).first()
     if token is not None:
@@ -58,5 +59,5 @@ def update_github_status(tasktopush):
         token.api_call('POST', '/repos/%s/statuses/%s' % (repository, tasktopush.push.after.hash), {
             'state': state,
             'description': description,
-            'context': 'continuous-integration/git.meiamso.me'
+            'context': 'continuous-integration/git.meiamso.me',
         })

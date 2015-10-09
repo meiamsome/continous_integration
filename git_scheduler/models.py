@@ -24,9 +24,9 @@ class RegisteredTask(models.Model):
 class TaskToPush(models.Model):
     task = models.ForeignKey(ScheduledTask)
     push = models.ForeignKey(Push)
+    submit_status = models.BooleanField(default=False)
 
 
 class GitHubAccessToken(models.Model):
     token = models.CharField(max_length=40)
     repositories = models.ManyToManyField(Repository)
-    submit_status = models.BooleanField(default=False)
