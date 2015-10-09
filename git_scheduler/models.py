@@ -1,6 +1,7 @@
 import base64
 from django.db import models
 import httplib
+import json
 import urllib
 
 from git.models import Push, Repository, Branch
@@ -39,10 +40,13 @@ class GitHubAccessToken(models.Model):
         connection = httplib.HTTPSConnection('api.github.com')
         connection.request(method, url, urllib.urlencode(data) if data is not None else None, {
             "Content-type": "application/x-www-form-urlencoded",
-            "Accept": "text/plain",
+            "Accept": "application/json",
             "Authorization": "Basic %s" % (
                 base64.encodestring("%s:%s" % (self.username, self.token)).replace('\n',''),
             ),
             "User-Agent": self.username,  # Should be changed to an app name probably
         })
-        return connection.getresponse()
+        response = connection.getresponse()
+        return_value = ((response.status, response.reason), json.loads(response.read()))
+        connection.close()
+        return return_value
