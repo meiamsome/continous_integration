@@ -15,13 +15,13 @@ def build_tasks(sender, instance, created, *args, **kwargs):
         for task in tasks:
             if task.branch is None or task.branch == instance.branch:
                 created = ScheduledTask(task=task.task, user=task.user, working_directory=task.working_directory,
-                                        submit_status=task.submit_status, arguments=" ".join((
+                                        arguments=" ".join((
                                             repository.get_name(),
                                             instance.branch.name,
                                             instance.after.hash,
                                         )))
                 created.save()
-                TaskToPush(task=created, push=instance).save()
+                TaskToPush(task=created, push=instance, submit_status=task.submit_status).save()
     # Update git hub statuses
     if sender == TaskToPush:
         if created and instance.submit_status:
