@@ -2,9 +2,11 @@ from contextlib import contextmanager
 from django.core.management.base import BaseCommand, CommandError
 import os
 import pwd
+import shutil
 import tempfile
 
 from task_manager.models import ScheduledTask
+
 
 @contextmanager
 def chdir_temporary_folder(folder_in):
@@ -16,7 +18,7 @@ def chdir_temporary_folder(folder_in):
     finally:
         os.chdir(old_folder)
         if folder_in is None:
-            os.rmtree(folder)
+            shutil.rmtree(folder)
 
 
 class Command(BaseCommand):
