@@ -43,5 +43,6 @@ class GitHubAccessToken(models.Model):
             "Authorization": "Basic %s" % (
                 base64.encodestring("%s:%s" % (self.username, self.token)).replace('\n',''),
             ),
+            "User-Agent": self.username,  # Should be changed to an app name probably
         })
         return connection.getresponse()
