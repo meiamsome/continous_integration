@@ -1,4 +1,7 @@
+import base64
 from django.db import models
+import httplib
+import urllib
 
 from git.models import Push, Repository, Branch
 from task_manager.models import Task, ScheduledTask
@@ -28,5 +31,16 @@ class TaskToPush(models.Model):
 
 
 class GitHubAccessToken(models.Model):
+    username = models.CharField(max_length=100)
     token = models.CharField(max_length=40)
     repositories = models.ManyToManyField(Repository)
+
+    def api_call(self, method, url, data=None):
+        connection = httplib.HTTPSConnection('api.github.com')
+        connection.request(method, url, urllib.urlencode(data) if data is not None else None, {
+            "Content-type": "application/x-www-form-urlencoded",
+            "Accept": "text/plain",
+            "Authorization": "Basic %s" % (
+                base64.encodestring("%s:%s" % (self.username, self.token)).replace('\n',''),
+            ),
+        })
