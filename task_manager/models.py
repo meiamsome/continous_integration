@@ -23,8 +23,8 @@ class ScheduledTask(models.Model):
         (0, 'Queued'),
         (-1, 'Error'),
     ), default=0)
-    working_directory = models.TextField()
-    output = models.TextField()
+    working_directory = models.TextField(blank=True)
+    output = models.TextField(blank=True)
 
     def __unicode__(self):
         return u"'%s' scheduled. (%s)" % (self.task, self.get_status_display())
