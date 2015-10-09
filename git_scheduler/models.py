@@ -2,7 +2,6 @@ import base64
 from django.db import models
 import httplib
 import json
-import urllib
 
 from git.models import Push, Repository, Branch
 from task_manager.models import Task, ScheduledTask
@@ -38,8 +37,8 @@ class GitHubAccessToken(models.Model):
 
     def api_call(self, method, url, data=None):
         connection = httplib.HTTPSConnection('api.github.com')
-        connection.request(method, url, urllib.urlencode(data) if data is not None else None, {
-            "Content-type": "application/x-www-form-urlencoded",
+        connection.request(method, url, json.dumps(data) if data is not None else None, {
+            "Content-type": "application/json",
             "Accept": "application/json",
             "Authorization": "Basic %s" % (
                 base64.encodestring("%s:%s" % (self.username, self.token)).replace('\n',''),
