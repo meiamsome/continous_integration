@@ -44,3 +44,4 @@ class GitHubAccessToken(models.Model):
                 base64.encodestring("%s:%s" % (self.username, self.token)).replace('\n',''),
             ),
         })
+        return connection.getresponse()
