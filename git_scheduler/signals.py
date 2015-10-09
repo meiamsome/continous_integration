@@ -41,7 +41,7 @@ def update_github_status(tasktopush):
     if not tasktopush.submit_status:
         return
     repository = tasktopush.push.repository
-    token = GitHubAccessToken.objects.filter(repositories__contains=repository).first()
+    token = GitHubAccessToken.objects.filter(repositories=repository).first()
     if token is not None:
         if tasktopush.task.status == ScheduledTask.QUEUED:
             state = 'pending'
