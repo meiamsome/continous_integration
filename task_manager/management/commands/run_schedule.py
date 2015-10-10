@@ -50,7 +50,7 @@ class Command(BaseCommand):
             exit_status >>= 8
             if exit_status == 0:
                 scheduled_task.status = ScheduledTask.COMPLETED
-            elif exit_status & 0x8:
+            elif exit_status & 0x80:
                 return  # If we have this status code then we should re-queue the task.
             else:
                 scheduled_task.status = ScheduledTask.ERROR
