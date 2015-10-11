@@ -42,7 +42,7 @@ class Command(BaseCommand):
         directory = scheduled_task.working_directory if scheduled_task.working_directory else None
         with chdir_temporary_folder(directory):
             pipe = os.popen(scheduled_task.task.execution + " " + scheduled_task.arguments)
-            scheduled_task.output += "\n".join(pipe.readlines())
+            scheduled_task.output += "\n".join([x.decode('utf-8') for x in pipe.readlines()])
             pid, exit_status = os.wait()
             if exit_status & 0xF:
                 # Error - process got killed
@@ -51,6 +51,7 @@ class Command(BaseCommand):
             if exit_status == 0:
                 scheduled_task.status = ScheduledTask.COMPLETED
             elif exit_status & 0x80:
+                scheduled_task.save()
                 return  # If we have this status code then we should re-queue the task.
             else:
                 scheduled_task.status = ScheduledTask.ERROR
