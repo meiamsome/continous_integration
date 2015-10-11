@@ -1,11 +1,23 @@
 from django.dispatch import receiver
 from django.db.models import Q
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 
 from git.models import Push
 from git_scheduler.models import RegisteredTask, TaskToPush
 from task_manager.models import ScheduledTask
 from slack_messenger.models import SlackAlert
+
+
+instance_to_pre_save_status = {}
+
+
+@receiver(pre_save)
+def pre_save_hook(sender, instance, *args, **kwargs):
+    if sender == ScheduledTask:
+        try:
+            instance_to_pre_save_status[instance.pk] = ScheduledTask.objects.get(pk=instance.pk).status
+        except ScheduledTask.DoesNotExist:
+            pass
 
 
 @receiver(post_save)
@@ -23,7 +35,7 @@ def handle_task_save(sender, instance, created, *args, **kwargs):
                 alert.alert(message)
 
     if sender == ScheduledTask:
-        if not created and instance.status != ScheduledTask.objects.get(id=instance.id).status:
+        if not created and instance.status != instance_to_pre_save_status[instance.id]:
             task_to_push = TaskToPush.objects.get(task=instance)
             repository = task_to_push.push.repository
             branch = task_to_push.push.branch
