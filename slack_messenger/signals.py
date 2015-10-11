@@ -23,7 +23,7 @@ def handle_task_save(sender, instance, created, *args, **kwargs):
                 alert.alert(message)
 
     if sender == ScheduledTask:
-        if not created:
+        if not created and instance.status != ScheduledTask.objects.get(id=instance.id).status:
             task_to_push = TaskToPush.objects.get(task=instance)
             repository = task_to_push.push.repository
             branch = task_to_push.push.branch
