@@ -17,10 +17,15 @@ def hook_url(request, repository):
     post_commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['after'])
     pre_commit, _ = Commit.objects.get_or_create(repository=repository, hash=data['before'])
     t_string = data['head_commit']['timestamp']
-    timezone = timedelta(hours=int(t_string[-5:-3]), minutes=int(t_string[-2:]))
-    if t_string[-6] == '-':
-        timezone = - timezone
-    time = datetime.strptime(t_string[:-6], "%Y-%m-%dT%H:%M:%S") - timezone
+    if t_string[-1] == 'Z':
+        timezone = timedelta()
+        t_string = t_string[:-1]
+    else:
+        timezone = timedelta(hours=int(t_string[-5:-3]), minutes=int(t_string[-2:]))
+        if t_string[-6] == '-':
+            timezone = - timezone
+        t_string = t_string[:-1]
+    time = datetime.strptime(t_string, "%Y-%m-%dT%H:%M:%S") - timezone
     branch, _ = Branch.objects.get_or_create(repository=repository, ref=data['ref'], defaults={
         'name': data['ref'].split('/')[-1],
         'head': post_commit,
