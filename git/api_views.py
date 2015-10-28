@@ -24,7 +24,7 @@ def hook_url(request, repository):
         timezone = timedelta(hours=int(t_string[-5:-3]), minutes=int(t_string[-2:]))
         if t_string[-6] == '-':
             timezone = - timezone
-        t_string = t_string[:-1]
+        t_string = t_string[:-6]
     time = datetime.strptime(t_string, "%Y-%m-%dT%H:%M:%S") - timezone
     branch, _ = Branch.objects.get_or_create(repository=repository, ref=data['ref'], defaults={
         'name': data['ref'].split('/')[-1],
